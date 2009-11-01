@@ -1,0 +1,6 @@
+# CBC Test Vectors - in Hex
+# Key                             Plain Text                                                  Cipher Text                                                       IV  
+# Note this vector will fail on the plaintext conversion due to the 00 padding at the end. See http://www.di-mgt.com.au/cryptopad.html#examplecbc for details
+0123456789ABCDEFF0E1D2C3B4A59687  37363534333231204E6F77206973207468652074696D6520666F722000  6B77B4D63006DEE605B156E27403979358DEB9E7154616D959F1652BD5FF92CC  FEDCBA9876543210
+# Alternative to the test vector above without the 00 at the end ( \0 )
+0123456789ABCDEFF0E1D2C3B4A59687  37363534333231204E6F77206973207468652074696D6520666F7220  6B77B4D63006DEE605B156E27403979358DEB9E7154616D959F1652BD5FF92CC  FEDCBA9876543210
