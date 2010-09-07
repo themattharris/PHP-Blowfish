@@ -4,11 +4,15 @@ PHP class which provides CBC and ECB Blowfish encryption without any external li
 
 h2. Dependencies
 
-* PHP 5 (4 may work but is untested)
+* PHP 5
 
 h2. Usage
 
 See the included example.php in the tests folder.
+
+h2. Authors
+
+Original author of PHP-Blowfish is Matt Harris. I forked his project in order to migrate his code to PHP5 (removing PHP4 compatibility).
 
 h2. The MIT License
 
