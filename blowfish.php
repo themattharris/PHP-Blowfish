@@ -12,7 +12,7 @@
 
 class Blowfish {
   # Mode constants
-  const BLOWFISH_MODE_EBC     = 10; 
+  const BLOWFISH_MODE_EBC     = 10;
   const BLOWFISH_MODE_CBC     = 11;
 
   # Padding mode constants
@@ -20,13 +20,13 @@ class Blowfish {
   const BLOWFISH_PADDING_RFC  = 21;
   const BLOWFISH_PADDING_ZERO = 22;
 
-  function Blowfish($key, $mode, $padding, $iv=NULL) {
+  public function __construct($key, $mode, $padding, $iv=NULL) {
     $this->mode = $mode;
     $this->padding = $padding;
     $this->N = 16;
     $this->blockSize = 8;
     $this->_applyKey($key);
-    if ( ! empty($iv)) {
+    if (!empty($iv)) {
       $this->IV = $this->_pad($iv);
     }
   }
@@ -42,7 +42,7 @@ class Blowfish {
    * @return string Returns the encrypted string. It is recommended you base64encode this for storage.
    * @author Matt Harris
    **/
-  function encrypt($plaintext, $key, $mode=Blowfish::BLOWFISH_MODE_CBC, $padding=Blowfish::BLOWFISH_PADDING_RFC, $iv=NULL) {
+  public function encrypt($plaintext, $key, $mode=Blowfish::BLOWFISH_MODE_CBC, $padding=Blowfish::BLOWFISH_PADDING_RFC, $iv=NULL) {
     if ( $mode == Blowfish::BLOWFISH_MODE_CBC and empty($iv) ) {
       throw new Exception('CBC Mode requires an IV key');
       return;
@@ -79,12 +79,12 @@ class Blowfish {
    * @return string Returns the plaintext string.
    * @author Matt Harris
    **/
-  function decrypt($ciphertext, $key, $mode=Blowfish::BLOWFISH_MODE_CBC, $padding=Blowfish::BLOWFISH_PADDING_RFC, $iv=NULL) {
+  public function decrypt($ciphertext, $key, $mode=Blowfish::BLOWFISH_MODE_CBC, $padding=Blowfish::BLOWFISH_PADDING_RFC, $iv=NULL) {
     if ( $mode == Blowfish::BLOWFISH_MODE_CBC and empty($iv) ) {
       throw new Exception('CBC Mode requires an IV key');
       return;
     }
-      
+
     $plaintext = '';
     $fish = new Blowfish($key, $mode, $padding, $iv);
     $block = &$fish->blockSize;
@@ -106,9 +106,9 @@ class Blowfish {
     return $plaintext;
   }
 
-  function _applyKey($key) {
-    $this->P = defaultKey::$P;
-    $this->S = defaultKey::$S;
+  private function _applyKey($key) {
+    $this->P = DefaultKey::$P;
+    $this->S = DefaultKey::$S;
 
     $j = 0;
     $len = strlen($key);
@@ -122,22 +122,22 @@ class Blowfish {
       }
       $this->P[$i] = $this->P[$i] ^ $data;
     }
-    
+
     $datal = 0x00000000;
     $datar = 0x00000000;
-    
-    for ($i=0; $i < $this->N+2; $i+=2) { 
+
+    for ($i=0; $i < $this->N+2; $i+=2) {
       $this->_encipher($datal, $datar);
       $this->P[$i] = $datal;
       $this->P[$i+1] = $datar;
     }
-    
+
     for ($i=0; $i < 4; ++$i) {
-      for ($j=0; $j < 256; $j+=2) { 
+      for ($j=0; $j < 256; $j+=2) {
         $this->_encipher($datal, $datar);
         $this->S[$i][$j] = $datal;
         $this->S[$i][$j+1] = $datar;
-      } 
+      }
     }
   }
 
@@ -145,10 +145,10 @@ class Blowfish {
    * Pads the plaintext to the specified block size using either 0's the method
    * described in RFC 3852 Section 6.3.
    *
-   * RFC 3852 method pads the input with a padding string of between 1 and 8 
-   * bytes to make the total length an exact multiple of 8 bytes. The value of 
-   * each byte of the padding string is set to the number of bytes added - 
-   * i.e. 8 bytes of value 0x08, 7 bytes of value 0x07, ..., 2 bytes of 0x02, 
+   * RFC 3852 method pads the input with a padding string of between 1 and 8
+   * bytes to make the total length an exact multiple of 8 bytes. The value of
+   * each byte of the padding string is set to the number of bytes added -
+   * i.e. 8 bytes of value 0x08, 7 bytes of value 0x07, ..., 2 bytes of 0x02,
    * or one byte of value 0x01.
    *
    * Ref: http://www.di-mgt.com.au/cryptopad.html
@@ -158,11 +158,11 @@ class Blowfish {
    * @return string Returns the plaintext string padded to block_size
    * @access private
    **/
-  function _pad($plaintext) {
+  private function _pad($plaintext) {
     $block = &$this->blockSize;
     $len = strlen($plaintext);
     $pad_len = ($len < $block) ? $block - $len : ($block - ( $len % $block )) % $block;
-    
+
     switch ($this->padding) {
       case Blowfish::BLOWFISH_PADDING_NONE:
         return $plaintext;
@@ -177,7 +177,7 @@ class Blowfish {
   }
 
   /**
-   * Unpads the plaintext removing all the 0's or using the method described 
+   * Unpads the plaintext removing all the 0's or using the method described
    * in RFC 3852 Section 6.3
    *
    * Ref: http://www.di-mgt.com.au/cryptopad.html
@@ -186,7 +186,7 @@ class Blowfish {
    * @return string Returns the plaintext without the padding bytes
    * @access private
    **/
-  function _unpad($plaintext) {
+  private function _unpad($plaintext) {
     $block = &$this->blockSize;
     $pad_len = ord(substr($plaintext, -1, 1));
 
@@ -221,7 +221,7 @@ class Blowfish {
    * Blowfish enciphering algorithm
    * @access private
    */
-  function _encipher(&$xL, &$xR) {
+  private function _encipher(&$xL, &$xR) {
     $_xL = $xL;
     $_xR = $xR;
 
@@ -243,7 +243,7 @@ class Blowfish {
    * Blowfish deciphering algorithm
    * @access private
    */
-  function _decipher(&$xL, &$xR) {
+  private function _decipher(&$xL, &$xR) {
     $_xL = $xL;
     $_xR = $xR;
 
@@ -265,7 +265,7 @@ class Blowfish {
    * Blowfish non-reversible F function
    * @access private
    */
-  function _F($x) {
+  private function _F($x) {
     $d = $x & 0xFF;
     $x >>= 8;
     $c = $x & 0xFF;
