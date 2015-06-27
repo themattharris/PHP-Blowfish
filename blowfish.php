@@ -37,7 +37,7 @@ class Blowfish {
    *
    * @param string $plaintext the string to encrypt
    * @param string $key the encryption key
-   * @param int $mode one of BLOWFISH_MODE_CBC, BLOWFISH_MODE_EBC. BLOWFISH_MODE_CBC is recommened
+   * @param int $mode one of BLOWFISH_MODE_[CBC, CFB, EBC]. BLOWFISH_MODE_CBC is recommened
    * @param int $padding one of BLOWFISH_PADDING_NONE, BLOWFISH_PADDING_RFC, BLOWFISH_PADDING_ZERO. BLOWFISH_PADDING_RFC is recommened
    * @param int $iv the initialisation vector. Required when using CBC mode.
    * @return string Returns the encrypted string. It is recommended you base64encode this for storage.
@@ -89,7 +89,7 @@ class Blowfish {
    * @author Matt Harris
    **/
   function decrypt($ciphertext, $key, $mode=Blowfish::BLOWFISH_MODE_CBC, $padding=Blowfish::BLOWFISH_PADDING_RFC, $iv=NULL) {
-    if ( $mode == Blowfish::BLOWFISH_MODE_CBC and empty($iv) ) {
+    if ( ($mode == Blowfish::BLOWFISH_MODE_CBC || $mode == Blowfish::BLOWFISH_MODE_CFB) and empty($iv) ) {
       throw new Exception('CBC Mode requires an IV key');
       return;
     }
