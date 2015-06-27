@@ -14,6 +14,7 @@ class Blowfish {
   # Mode constants
   const BLOWFISH_MODE_EBC     = 10; 
   const BLOWFISH_MODE_CBC     = 11;
+  const BLOWFISH_MODE_CFB     = 12;
 
   # Padding mode constants
   const BLOWFISH_PADDING_NONE = 20;
@@ -58,11 +59,19 @@ class Blowfish {
       if ($mode == Blowfish::BLOWFISH_MODE_CBC) {
         $chain = ($i == 0) ? $fish->IV : substr($ciphertext, $i - $block, $block);
         list(, $xL, $xR) = unpack('N2', substr($paded, $i, $block) ^ $chain);
-      } else {
+        $fish->_encipher($xL, $xR);
+        list(, $a, $b) = unpack('N2',  pack('N2', $xL, $xR));
+        $ciphertext .= pack('N2', $xL, $xR);
+      } else if ($mode ==Blowfish::BLOWFISH_MODE_CFB) {
+        $chain = ($i == 0) ? $fish->IV : substr($ciphertext, $i - $block, $block);
+        list(, $xL, $xR) = unpack('N2', $chain);
+        $fish->_encipher($xL, $xR);
+        $ciphertext .= substr($paded, $i, $block) ^ pack('N2', $xL, $xR);
+      }else {
         list(, $xL, $xR) = unpack('N2', substr($paded, $i, $block));
+        $fish->_encipher($xL, $xR);
+        $ciphertext .= pack('N2', $xL, $xR);
       }
-      $fish->_encipher($xL, $xR);
-      $ciphertext .= pack('N2', $xL, $xR);
     }
     unset($fish);
     return $ciphertext;
@@ -92,12 +101,19 @@ class Blowfish {
 
     # encrypt in 1 byte intervals
     for ($i=0; $i < $len; $i+=$block) {
-      list(, $xL, $xR) = unpack('N2', substr($ciphertext, $i, $block));
-      $fish->_decipher($xL, $xR);
       if ($mode == Blowfish::BLOWFISH_MODE_CBC) {
+        list(, $xL, $xR) = unpack('N2', substr($ciphertext, $i, $block));
+        $fish->_decipher($xL, $xR);
         $chain = ($i == 0) ? $fish->IV : substr($ciphertext, $i - $block, $block);
         $plaintext .= (pack('N2', $xL, $xR) ^ $chain);
+      } elseif ($mode == Blowfish::BLOWFISH_MODE_CFB) {
+        $chain = ($i == 0) ? $fish->IV : substr($ciphertext, $i - $block, $block);
+        list(, $xL, $xR) = unpack('N2', $chain);
+        $fish->_encipher($xL, $xR);   // ENcipher!
+        $plaintext .=  (substr($ciphertext, $i, $block) ^ pack('N2', $xL, $xR));
       } else {
+        list(, $xL, $xR) = unpack('N2', substr($ciphertext, $i, $block));
+        $fish->_decipher($xL, $xR);
         $plaintext .= pack('N2', $xL, $xR);
       }
     }

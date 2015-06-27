@@ -1,0 +1,3 @@
+# CFB Test Vectors - in Hex
+# Key                             Plain Text                                                  Cipher Text                                                       IV  
+0123456789ABCDEFF0E1D2C3B4A59687  37363534333231204E6F77206973207468652074696D6520666F722000  E73214A2822139CAF26ECF6D2EB9E76E3DA3DE04D1517200519D57A6C3        FEDCBA9876543210

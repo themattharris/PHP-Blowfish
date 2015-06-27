@@ -9,6 +9,10 @@ switch (strtolower(@$_GET['m'])) {
     $mode = Blowfish::BLOWFISH_MODE_CBC;
     $vectors = file(dirname(__FILE__) . '/vectors_cbc.txt');
     break;
+  case 'cfb':
+    $mode = Blowfish::BLOWFISH_MODE_CFB;
+    $vectors = file(dirname(__FILE__) . '/vectors_cfb.txt');
+    break;
   case 'key':
     $mode = Blowfish::BLOWFISH_MODE_EBC;
     $vectors = file(dirname(__FILE__) . '/vectors_key.txt');
@@ -20,7 +24,7 @@ switch (strtolower(@$_GET['m'])) {
 }
 
 echo '<pre>';
-if ($mode == Blowfish::BLOWFISH_MODE_CBC) {
+if ($mode == Blowfish::BLOWFISH_MODE_CBC || $mode == Blowfish::BLOWFISH_MODE_CFB) {
   echo sprintf('%-20s%-50s%-50s%-10s%s', 'Key/IV', 'Plain/Cipher In', 'Plain/Cipher Out', 'Result', PHP_EOL);
   echo sprintf('%-20s%-50s%-50s%-10s%s', '------', '---------------', '----------------', '------', PHP_EOL);  
 } else {
@@ -30,7 +34,7 @@ if ($mode == Blowfish::BLOWFISH_MODE_CBC) {
 foreach ($vectors as $v) {
   $v = trim($v);
   if ($v AND ($v[0] != '#')) {
-    if ($mode == Blowfish::BLOWFISH_MODE_CBC) {
+    if ($mode == Blowfish::BLOWFISH_MODE_CBC || $mode == Blowfish::BLOWFISH_MODE_CFB) {
       list($key, $plaintext, $expected_ciphertext, $iv) = preg_split('/\s+/', $v);
     } else {
       list($key, $plaintext, $expected_ciphertext) = preg_split('/\s+/', $v);
@@ -40,7 +44,7 @@ foreach ($vectors as $v) {
     $key = trim($key);
     $key = pack('H' . strlen($key), $key);
     
-    if ($mode == Blowfish::BLOWFISH_MODE_CBC) {
+    if ($mode == Blowfish::BLOWFISH_MODE_CBC || $mode == Blowfish::BLOWFISH_MODE_CFB) {
       $iv = trim($iv);
       $iv = pack('H' . strlen($iv), $iv);
     }
